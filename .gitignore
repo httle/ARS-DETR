@@ -124,9 +124,9 @@ mmrotate/.mim
 .data/*
 data
 note.txt
-#configs/_base_
-#.configs/_base_
-#.configs/_base_/*
+configs/_base_
+.configs/_base_
+.configs/_base_/*
 
 pretrained
 .pretrained/
