@@ -11,6 +11,7 @@ from .rotated_retina_refine_head import RotatedRetinaRefineHead
 from .rotated_rpn_head import RotatedRPNHead
 from .sam_reppoints_head import SAMRepPointsHead
 from .rotated_detr_head import RotatedDETRHead
+from .rotated_deformable_detr_head import RotatedDeformableDETRHead
 from .ars_detr_head import ARSDeformableDETRHead
 from .dn_ars_detr_head import DNARSDeformableDETRHead
 
@@ -19,6 +20,6 @@ __all__ = [
     'OrientedRPNHead', 'RotatedRetinaRefineHead', 'ODMRefineHead',
     'KFIoURRetinaHead', 'KFIoURRetinaRefineHead', 'KFIoUODMRefineHead',
     'RotatedRepPointsHead', 'SAMRepPointsHead',
-    'RotatedDETRHead', 'ARSDeformableDETRHead',
-    'DNARSDeformableDETRHead'
+    'RotatedDETRHead', 'RotatedDeformableDETRHead',
+    'ARSDeformableDETRHead', 'DNARSDeformableDETRHead'
 ]

@@ -155,23 +155,36 @@ class CSLCoder(BaseBBoxCoder):
         angle[angle.shape[0] // 2] = 1e-6  # prevent nan
         inds = (2 * (math.pi / 2 - torch.arctan(aspect_ratio)) /
                 math.pi * 180 / self.omega).long()[:, 0].to(aspect_ratio.device)  # count the critical angle
-        x = torch.ones((aspect_ratio.shape[0], angle.shape[0])).to(aspect_ratio.device)
-        y = x.clone() * aspect_ratio
+        # x = torch.ones((aspect_ratio.shape[0], angle.shape[0])).to(aspect_ratio.device)
+        # y = x.clone() * aspect_ratio
+        #
+        # # count the IoU in situation 1
+        # inter1 = 4 * x * x / torch.sin(angle)
+        # union1 = 2 * 4 * (x * y) - inter1
+        # iou1 = inter1 / union1
+        #
+        # res = torch.zeros_like(iou1).to(aspect_ratio.device)
+        #
+        # # count the IoU in situation 2
+        # k = (x / torch.tan(angle / 2) - y) * torch.tan(angle / 2)
+        # inter2 = 4 * x * y - k * k * torch.tan(angle) - \
+        #          torch.pow((2 * x - k / torch.cos(angle) - k), 2) \
+        #          * torch.tan(math.pi / 2 - angle)
+        # uinon2 = 2 * 4 * x * y - inter2
+        # iou2 = inter2 / uinon2
 
-        # count the IoU in situation 1
-        inter1 = 4 * x * x / torch.sin(angle)
-        union1 = 2 * 4 * (x * y) - inter1
-        iou1 = inter1 / union1
+        k = torch.ones((aspect_ratio.shape[0], angle.shape[0])).to(aspect_ratio.device) \
+            * aspect_ratio
+
+        iou1 = 4 / (8 * k * torch.sin(angle) - 4)
+
+        x = (1 - k * torch.tan(angle / 2)) * torch.tan(angle)
+        y = ((-2 * torch.sin(angle / 2) * torch.sin(angle / 2) +
+              k * torch.sin(angle)) / torch.cos(angle))
+        iou2 = (4 * k * torch.tan(angle) - x * x - y * y) / \
+               (4 * k * torch.tan(angle) + x * x + y * y)
 
         res = torch.zeros_like(iou1).to(aspect_ratio.device)
-
-        # count the IoU in situation 2
-        k = (x / torch.tan(angle / 2) - y) * torch.tan(angle / 2)
-        inter2 = 4 * x * y - k * k * torch.tan(angle) - \
-                 torch.pow((2 * x - k / torch.cos(angle) - k), 2) \
-                 * torch.tan(math.pi / 2 - angle)
-        uinon2 = 2 * 4 * x * y - inter2
-        iou2 = inter2 / uinon2
 
         for i, ind in enumerate(inds):
             # replace the value of iou1 within the range of ind with
