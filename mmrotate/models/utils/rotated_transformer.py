@@ -151,7 +151,6 @@ class RotatedDeformableDetrTransformer(Transformer):
         N, S, C = memory.shape
         proposals = []
         _cur = 0
-        # 生成网格一样的proposals
         for lvl, (H, W) in enumerate(spatial_shapes):
             mask_flatten_ = memory_padding_mask[:, _cur:(_cur + H * W)].view(
                 N, H, W, 1)
@@ -171,19 +170,13 @@ class RotatedDeformableDetrTransformer(Transformer):
             wh = torch.ones_like(grid) * 0.05 * (2.0**lvl)
             angle = torch.zeros_like(mask_flatten_)
             proposal = torch.cat((grid, wh, angle), -1).view(N, -1, 5)
-            # proposal = torch.cat((grid, wh), -1).view(N, -1, 4)
             proposals.append(proposal)
             _cur += (H * W)
         output_proposals = torch.cat(proposals, 1)
         output_proposals_valid = ((output_proposals[..., :4] > 0.01) &
                                   (output_proposals[..., :4] < 0.99)).all(
             -1, keepdim=True)
-        # 反sigmoid函数 inversigmoid
         output_proposals[..., :4] = torch.log(output_proposals[..., :4] / (1 - output_proposals[..., :4]))
-        # output_proposals = output_proposals.masked_fill(
-        #     memory_padding_mask.unsqueeze(-1), float('inf'))
-        # output_proposals = output_proposals.masked_fill(
-        #     ~output_proposals_valid, float('inf'))
         output_proposals[..., :4] = output_proposals[..., :4].masked_fill(
             memory_padding_mask.unsqueeze(-1), 10000)
         output_proposals[..., :4] = output_proposals[..., :4].masked_fill(
@@ -251,11 +244,8 @@ class RotatedDeformableDetrTransformer(Transformer):
         dim_t = torch.arange(
             num_pos_feats, dtype=torch.float32, device=proposals.device)
         dim_t = temperature**(2 * (dim_t // 2) / num_pos_feats)
-        # N, L, 4
         proposals = proposals.sigmoid() * scale
-        # N, L, 4, 128
         pos = proposals[:, :, :, None] / dim_t
-        # N, L, 4, 64, 2
         pos = torch.stack((pos[:, :, :, 0::2].sin(), pos[:, :, :, 1::2].cos()),
                           dim=4).flatten(2)
         return pos
@@ -327,7 +317,6 @@ class RotatedDeformableDetrTransformer(Transformer):
         for lvl, (feat, mask, pos_embed) in enumerate(
                 zip(mlvl_feats, mlvl_masks, mlvl_pos_embeds)):
             bs, c, h, w = feat.shape
-            # pos_embed.shape = [2, 256, 128, 128]
             spatial_shape = (h, w)
             spatial_shapes.append(spatial_shape)
             # [bs, w*h, c]
@@ -358,8 +347,6 @@ class RotatedDeformableDetrTransformer(Transformer):
         feat_flatten = feat_flatten.permute(1, 0, 2)  # (H*W, bs, embed_dims)
         lvl_pos_embed_flatten = lvl_pos_embed_flatten.permute(
             1, 0, 2)  # (H*W, bs, embed_dims)
-        # 21760 = 128*128+64*64+32*32+16*16 query的个数
-        # memory是编码后的每个query和keys在多层featuremap中对应的特征 一维特征 256
         memory = self.encoder(
             query=feat_flatten,
             key=None,
@@ -395,11 +382,8 @@ class RotatedDeformableDetrTransformer(Transformer):
                 enc_outputs_coord_unact_angle, 1,
                 topk_proposals.unsqueeze(-1).repeat(1, 1, 5))
             topk_coords_unact = topk_coords_unact.detach()
-            # obb2xyxy
-            # reference_points = obb2poly_tr(topk_coords_unact).sigmoid()
-            reference_points = topk_coords_unact[..., :4].sigmoid()
+            reference_points = topk_coords_unact.sigmoid()
             init_reference_out = reference_points
-            # obb2xywh
             pos_trans_out = self.pos_trans_norm(
                 self.pos_trans(self.get_proposal_pos_embed(topk_coords_unact[..., :4])))
             query_pos, query = torch.split(pos_trans_out, c, dim=2)
@@ -488,6 +472,10 @@ class RotatedDeformableDetrTransformerDecoder(TransformerLayerSequence):
             if reference_points.shape[-1] == 4:
                 reference_points_input = reference_points[:, :, None] * \
                                          torch.cat([valid_ratios, valid_ratios], -1)[:, None]
+            elif reference_points.shape[-1] == 5:
+                reference_points2 = reference_points.clone()[..., :4]
+                reference_points_input = reference_points2[:, :, None] * \
+                                         torch.cat([valid_ratios, valid_ratios], -1)[:, None]
             else:
                 assert reference_points.shape[-1] == 2
                 reference_points_input = reference_points[:, :, None] * \
@@ -505,6 +493,9 @@ class RotatedDeformableDetrTransformerDecoder(TransformerLayerSequence):
                 if reference_points.shape[-1] == 4:
                     new_reference_points = tmp[..., :4] + inverse_sigmoid(
                         reference_points)
+                    new_reference_points = new_reference_points.sigmoid()
+                elif reference_points.shape[-1] == 5:
+                    new_reference_points = tmp + inverse_sigmoid(reference_points)
                     new_reference_points = new_reference_points.sigmoid()
                 else:
                     assert reference_points.shape[-1] == 2

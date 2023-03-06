@@ -185,7 +185,6 @@ class RotatedDeformableDETRHead(RotatedDETRHead):
         hs = hs.permute(0, 2, 1, 3)
         outputs_classes = []
         outputs_coords = []
-        reference_angle = torch.zeros_like(init_reference[..., -1]).unsqueeze(-1)
         for lvl in range(hs.shape[0]):
             if lvl == 0:
                 reference = init_reference
@@ -196,6 +195,8 @@ class RotatedDeformableDETRHead(RotatedDETRHead):
             tmp = self.reg_branches[lvl](hs[lvl])
             if reference.shape[-1] == 4:
                 tmp[..., :4] += reference
+            elif reference.shape[-1] == 5:
+                tmp += reference
             elif reference.shape[-1] == 8:
                 tmp = obb2poly_tr(tmp)
                 tmp += reference
@@ -205,8 +206,7 @@ class RotatedDeformableDETRHead(RotatedDETRHead):
 
 
             outputs_coord = tmp[...,:4].sigmoid()
-            reference_angle += tmp[...,4:]
-            angle = (reference_angle.sigmoid()-0.5) * math.pi
+            angle = (tmp[..., 4:].sigmoid()-0.5) * math.pi
             outputs_coord = torch.cat((outputs_coord, angle), dim=-1)
             outputs_classes.append(outputs_class)
             outputs_coords.append(outputs_coord)
