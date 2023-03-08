@@ -1,39 +1,39 @@
-# ARS-DETR
 
-#### 介绍
-{**以下是 Gitee 平台说明，您可以替换此简介**
-Gitee 是 OSCHINA 推出的基于 Git 的代码托管平台（同时支持 SVN）。专为开发者提供稳定、高效、安全的云端软件开发协作平台
-无论是个人、团队、或是企业，都能够用 Gitee 实现代码托管、项目管理、协作开发。企业项目请看 [https://gitee.com/enterprises](https://gitee.com/enterprises)}
+## Introduction
 
-#### 软件架构
-软件架构说明
+### ARS-DETR: Aspect Ratio Sensitive Oriented Object Detection with Transformer.
 
+## Abstract
 
-#### 安装教程
+Existing oriented object detection methods commonly use metric AP50 to measure the performance of the model. We argue that AP50 is inherently unsuitable for oriented object detection due to its large tolerance in angle deviation. Therefore, we advocate using high-precision metric, e.g. AP75, to measure the performance of models. In this paper, we propose an Aspect Ratio Sensitive Oriented Object Detector with Transformer, termed ARS-DETR, which exhibits a competitive performance in high-precision oriented object detection. Specifically, a new angle classification method, calling Aspect Ratio aware Circle Smooth Label (AR-CSL), is proposed to smooth the angle label in a more reasonable way and discard the hyperparameter that introduced by previous work (e.g. CSL). Then, a rotated deformable attention module is designed to rotate the sampling points with the corresponding angles and eliminate the misalignment between region features and sampling points. Moreover, a dynamic weight coefficient according to the aspect ratio is adopted to calculate the angle loss. Comprehensive experiments on several challenging datasets show that our method achieves competitive performance on the high-precision oriented object detection task. Source code will be made publicly available.
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+## Results and models
 
-#### 使用说明
+DOTA1.0
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### 参与贡献
-
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+|         Backbone         | AP50  | AP75  | Angle | lr schd | Aug  | Batch Size |                           Configs                            |                           Download                           |
+| :----------------------: | :---: | ----- | :---: | :-----: | :--: | :--------: | :----------------------------------------------------------: | :----------------------------------------------------------: |
+| ResNet50 (1024,1024,200) | 63.42 | 26.92 | le90  |   3x    |  -   |     2      | [deformable_detr_r50_dota](./configs/deformable_detr_r50_dota.py) | [model](https://1drv.ms/u/s!AsmpWJamS0mRf7JkW3wV_2dGhBk?e=t3VkgJ) |
+| ResNet50 (1024,1024,200) | 72.08 | 43.22 | le90  |   3x    |  -   |     2      |     [csl_detr_r50_dota](./configs/csl_detr_r50_dota.py)      | [model](https://1drv.ms/u/s!AsmpWJamS0mRgQBmD3NwjSz4yMq9?e=adE1lc) |
+| ResNet50 (1024,1024,200) | 72.66 | 45.64 | le90  |   3x    |  -   |     2      |   [arcsl_detr_r50_dota](./configs/arcsl_detr_r50_dota.py)    | [model](https://1drv.ms/u/s!AsmpWJamS0mRgQHpsBm_BV8QIpZv?e=geZKEx) |
+| ResNet50 (1024,1024,200) | 73.42 | 48.41 | le90  |   3x    |  -   |     2      | [dn_arw_arm_arcsl_rdetr_r50_dota](./configs/dn_arw_arm_arcsl_rdetr_r50_dota.py) | [model](https://1drv.ms/u/s!AsmpWJamS0mRgQLIqpXPR5jzLNxo?e=EgP5Gp) |
 
 
-#### 特技
 
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+
+## Installation
+
+Please refer to [install.md](docs/en/install.md) for installation guide.
+
+## Get Started
+
+Please see [get_started.md](docs/en/get_started.md) for the basic usage of MMRotate.
+
+## Data Preparation
+
+Please refer to [data_preparation.md](tools/data/README.md) to prepare the data.
+
+## Acknowledgement
+
+MMRotate is an open source project that is contributed by researchers and engineers from various colleges and companies. We appreciate all the contributors who implement their methods or add new features, as well as users who give valuable feedbacks. We wish that the toolbox and benchmark could serve the growing research community by providing a flexible toolkit to reimplement existing methods and develop their own new methods.
+
