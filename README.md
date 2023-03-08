@@ -23,7 +23,7 @@ DOTA1.0
 
 ## Installation
 
-Please refer to [install.md](docs/en/install.md) for installation guide.
+Please refer to the official guide of [MMRotate 0.x](https://github.com/open-mmlab/mmrotate) or [install.md](docs/en/install.md) for installation guide.
 
 ## Get Started
 
