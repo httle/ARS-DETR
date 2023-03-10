@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-_base_ = 'norm_arsl_detr_r50_dota.py'
+_base_ = 'arcsl_detr_r50_dota.py'
 model = dict(
     bbox_head=dict(
         type='DNARSDeformableDETRHead',
