@@ -1,7 +1,7 @@
 
 ## Introduction
 
-### ARS-DETR: Aspect Ratio Sensitive Oriented Object Detection with Transformer.
+### [ARS-DETR: Aspect Ratio Sensitive Oriented Object Detection with Transformer](https://arxiv.org/abs/2303.04989)
 
 ## Abstract
 
@@ -37,3 +37,12 @@ Please refer to [data_preparation.md](tools/data/README.md) to prepare the data.
 
 MMRotate is an open source project that is contributed by researchers and engineers from various colleges and companies. We appreciate all the contributors who implement their methods or add new features, as well as users who give valuable feedbacks. We wish that the toolbox and benchmark could serve the growing research community by providing a flexible toolkit to reimplement existing methods and develop their own new methods.
 
+## Citation
+```
+@article{zeng2023ars-detr,
+  title={ARS-DETR: Aspect Ratio Sensitive Oriented Object Detection with Transformer},
+  author={Zeng, Ying and Yang, Xue, Li, Qingyun and Chen, Yushi and Yan, Junchi},
+  journal={arXiv preprint arXiv:2303.04989},
+  year={2023}
+}
+```
